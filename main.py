@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HPTM Tools Shelfs",
     "author": "HPTM",
-    "version": (0, 0, 1),
+    "version": (0, 0, 3),
     "blender": (4, 0, 2),
     "location": "View3D > UI > Tools Shelfs",
     "description": "Add a Tools Shelf UI for HPTM",
