@@ -1,7 +1,7 @@
 bl_info = {
     "name": "HPTM Tools Shelfs",
     "author": "HPTM",
-    "version": (0, 0, 1),
+    "version": (0, 0, 3),
     "blender": (4, 0, 2),
     "location": "View3D > UI > Tools Shelfs",
     "description": "Add a Tools Shelf UI for HPTM",
@@ -28,30 +28,42 @@ GITHUB_REPO_NAME = "BlenderToolsShelftUI"
 GITHUB_RELEASE_TAG = ".".join(map(str, bl_info["version"]))
 
 def download_and_extract_release():
-    # Download the release zip file from GitHub
-    zip_url = f"https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/archive/ToolsShelfUI/main.zip"
-    response = requests.get(zip_url)
-    
-    # Check if the download was successful
-    if response.status_code != 200:
-        raise Exception(f"Failed to download from {zip_url}")
+    try:
+        # Download the main branch zip file from GitHub
+        zip_url = f"https://github.com/{GITHUB_REPO_OWNER}/{GITHUB_REPO_NAME}/archive/main.zip"
+        response = requests.get(zip_url, stream=True)
+        
+        # Check if the request was successful (status code 200)
+        response.raise_for_status()
 
-    # Create a temporary directory to extract the contents
-    temp_dir = tempfile.mkdtemp()
-    
-    # Save the zip file to disk
-    zip_path = os.path.join(temp_dir, 'addon_update.zip')
-    with open(zip_path, 'wb') as zip_file:
-        zip_file.write(response.content)
+        # Create a temporary directory to extract the contents
+        temp_dir = tempfile.mkdtemp()
 
-    # Extract the contents of the zip file
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(temp_dir)
+        # Save the zip file to disk
+        zip_path = os.path.join(temp_dir, 'addon_update.zip')
+        with open(zip_path, 'wb') as zip_file:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    zip_file.write(chunk)
 
-    # Clean up the downloaded zip file
-    os.remove(zip_path)
+        # Extract the contents of the zip file
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(temp_dir)
 
-    return temp_dir
+        # Clean up the downloaded zip file
+        os.remove(zip_path)
+
+        return temp_dir
+
+    except requests.exceptions.HTTPError as e:
+        print(f"HTTP Error: {e}")
+        raise Exception(f"Failed to download from {zip_url}. HTTP Error: {e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Request Error: {e}")
+        raise Exception(f"Failed to download from {zip_url}. Error: {e}")
+
+
+# Rest of your code...
 
 # Main Class
 class HPTMPanel(bpy.types.Panel):
