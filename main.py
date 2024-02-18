@@ -24,7 +24,7 @@ import zipfile
 
 # GitHub repository information
 GITHUB_REPO_OWNER = "renceberson"
-GITHUB_REPO_NAME = "Blender.py"
+GITHUB_REPO_NAME = "BlenderToolsShelftUI"
 GITHUB_RELEASE_TAG = ".".join(map(str, bl_info["version"]))
 
 def download_and_extract_release():
